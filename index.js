@@ -26,26 +26,33 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     // all collection in database
     const userCollection = client.db('forumFlareDB').collection('users');
+    const postCollection = client.db('forumFlareDB').collection('posts');
 
     // user related api
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log(user);
-
       //user existing checking
       const query = { email: user.email };
       const existingUser = await userCollection.findOne(query);
-      console.log(existingUser);
-
       if (existingUser) {
         return res.send({ message: 'User already exist', insertedId: null });
       }
-
       const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+
+    // posts related api
+    app.get('/posts', async (req, res) => {
+      const tag = req.query.tag;
+      let query = {};
+      if (tag) {
+        query = { tags: { $regex: new RegExp(tag, 'i') } };
+      }
+      const result = await postCollection.find(query).toArray();
       res.send(result);
     });
 
