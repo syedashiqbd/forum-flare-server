@@ -53,11 +53,29 @@ async function run() {
       if (tag) {
         query = { tags: { $regex: new RegExp(tag, 'i') } };
       }
-      const result = await postCollection
+      const regularPost = await postCollection
         .find(query)
         .sort({ time: -1 })
         .toArray();
-      res.send(result);
+
+      // calculate the popularity based on upvote and downvote
+      const popularPost = await postCollection
+        .aggregate([
+          {
+            $match: query,
+          },
+          {
+            $addFields: {
+              voteDifference: { $subtract: ['$upvote', '$downvote'] },
+            },
+          },
+          {
+            $sort: { voteDifference: -1 },
+          },
+        ])
+        .toArray();
+
+      res.send({ regularPost, popularPost });
     });
 
     //tag name related api
