@@ -31,6 +31,7 @@ async function run() {
     // all collection in database
     const userCollection = client.db('forumFlareDB').collection('users');
     const postCollection = client.db('forumFlareDB').collection('posts');
+    const tagCollection = client.db('forumFlareDB').collection('tags');
 
     // user related api
     app.post('/users', async (req, res) => {
@@ -52,7 +53,16 @@ async function run() {
       if (tag) {
         query = { tags: { $regex: new RegExp(tag, 'i') } };
       }
-      const result = await postCollection.find(query).toArray();
+      const result = await postCollection
+        .find(query)
+        .sort({ time: -1 })
+        .toArray();
+      res.send(result);
+    });
+
+    //tag name related api
+    app.get('/tags', async (req, res) => {
+      const result = await tagCollection.find().toArray();
       res.send(result);
     });
 
