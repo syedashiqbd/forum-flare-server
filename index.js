@@ -101,6 +101,41 @@ async function run() {
       res.send(result);
     });
 
+    // vote related api
+    app.patch('/upvote/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const update = {
+        $inc: { upvote: 1 },
+      };
+      const updatedPost = await postCollection.findOneAndUpdate(
+        filter,
+        update,
+        {
+          returnDocument: 'after',
+        }
+      );
+
+      res.send(updatedPost);
+    });
+
+    app.patch('/downvote/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const update = {
+        $inc: { downvote: 1 },
+      };
+      const updatedPost = await postCollection.findOneAndUpdate(
+        filter,
+        update,
+        {
+          returnDocument: 'after',
+        }
+      );
+
+      res.send(updatedPost);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
