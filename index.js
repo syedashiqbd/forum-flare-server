@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -86,8 +86,13 @@ async function run() {
 
       // total post count
       const totalPost = await postCollection.estimatedDocumentCount();
-
       res.send({ regularPost, popularPost, totalPost });
+    });
+    app.get('/postDetails/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await postCollection.findOne(query);
+      res.send(result);
     });
 
     //tag name related api
