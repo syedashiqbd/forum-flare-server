@@ -48,6 +48,11 @@ async function run() {
 
     // posts related api
     app.get('/posts', async (req, res) => {
+      //for pagination
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+
+      //   for regular and search query
       const tag = req.query.tag;
       let query = {};
       if (tag) {
@@ -56,6 +61,8 @@ async function run() {
       const regularPost = await postCollection
         .find(query)
         .sort({ time: -1 })
+        .skip(page * limit) //for pagination
+        .limit(limit) //for pagination
         .toArray();
 
       // calculate the popularity based on upvote and downvote
@@ -73,9 +80,14 @@ async function run() {
             $sort: { voteDifference: -1 },
           },
         ])
+        .skip(page * limit) //for pagination
+        .limit(limit) //for pagination
         .toArray();
 
-      res.send({ regularPost, popularPost });
+      // total post count
+      const totalPost = await postCollection.estimatedDocumentCount();
+
+      res.send({ regularPost, popularPost, totalPost });
     });
 
     //tag name related api
