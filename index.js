@@ -1,7 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+  MongoAWSError,
+} = require('mongodb');
 const app = express();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 5000;
@@ -46,6 +51,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/users', async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
+  
     // posts related api
     app.get('/posts', async (req, res) => {
       //for pagination
