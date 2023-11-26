@@ -51,12 +51,29 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/users', async (req, res) => {
-      const result = await userCollection.find().toArray();
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
       res.send(result);
     });
 
-  
+    // for user badge update api
+    app.patch('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user.badge === 'bronze') {
+        await userCollection.updateOne(query, {
+          $set: {
+            badge: 'gold',
+          },
+        });
+        user.badge;
+      }
+      res.send(user);
+    });
+
     // posts related api
     app.get('/posts', async (req, res) => {
       //for pagination
