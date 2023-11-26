@@ -74,6 +74,30 @@ async function run() {
       res.send(user);
     });
 
+    //user info from two collection based on email
+    app.get('/user/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await userCollection
+        .aggregate([
+          {
+            $match: {
+              email: email,
+            },
+          },
+          {
+            $lookup: {
+              from: 'posts',
+              localField: 'email',
+              foreignField: 'email',
+              as: 'userPost',
+            },
+          },
+        ])
+
+        .toArray();
+      res.send(result[0]);
+    });
+
     // posts related api
     app.get('/posts', async (req, res) => {
       //for pagination
