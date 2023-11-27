@@ -232,6 +232,23 @@ async function run() {
       res.send(result);
     });
 
+    // update feedback and report for a comment
+    app.patch('/comments/:id/feedback', async (req, res) => {
+      const commentId = req.params.id;
+      const { feedback } = req.body;
+
+      const result = await commentCollection.updateOne(
+        { _id: new ObjectId(commentId) },
+        {
+          $set: {
+            feedback,
+            reported: true,
+          },
+        }
+      );
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
