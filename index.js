@@ -37,6 +37,7 @@ async function run() {
     const userCollection = client.db('forumFlareDB').collection('users');
     const postCollection = client.db('forumFlareDB').collection('posts');
     const tagCollection = client.db('forumFlareDB').collection('tags');
+    const commentCollection = client.db('forumFlareDB').collection('comments');
 
     // user related api
     app.post('/users', async (req, res) => {
@@ -154,6 +155,13 @@ async function run() {
       res.send(result);
     });
 
+    app.delete('/post/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await postCollection.deleteOne(query);
+      res.send(result);
+    });
+
     //tag name related api
     app.get('/tags', async (req, res) => {
       const result = await tagCollection.find().toArray();
@@ -208,6 +216,13 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    // comments related api
+    app.post('/comment', async (req, res) => {
+      const item = req.body;
+      const result = await commentCollection.insertOne(item);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
