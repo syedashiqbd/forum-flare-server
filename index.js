@@ -140,10 +140,17 @@ async function run() {
       const totalPost = await postCollection.estimatedDocumentCount();
       res.send({ regularPost, popularPost, totalPost });
     });
+
     app.get('/postDetails/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await postCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post('/posts', async (req, res) => {
+      const query = req.body;
+      const result = await postCollection.insertOne(query);
       res.send(result);
     });
 
