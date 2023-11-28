@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const {
   MongoClient,
   ServerApiVersion,
@@ -38,6 +39,15 @@ async function run() {
     const postCollection = client.db('forumFlareDB').collection('posts');
     const tagCollection = client.db('forumFlareDB').collection('tags');
     const commentCollection = client.db('forumFlareDB').collection('comments');
+
+    // jwt related api
+    app.post('/jwt', (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '1h',
+      });
+      res.send({ token });
+    });
 
     // user related api
     app.post('/users', async (req, res) => {
