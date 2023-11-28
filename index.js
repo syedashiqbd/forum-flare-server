@@ -50,6 +50,11 @@ async function run() {
     });
 
     // user related api
+    app.get('/users', async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
     app.post('/users', async (req, res) => {
       const user = req.body;
       //user existing checking
@@ -108,6 +113,24 @@ async function run() {
         .toArray();
       res.send(result[0]);
     });
+
+    // for making change role to admin
+    app.patch(
+      '/users/admin/:id',
+      // verifyToken,
+      // verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = {
+          $set: {
+            role: 'admin',
+          },
+        };
+        const result = await userCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+      }
+    );
 
     // posts related api
     app.get('/posts', async (req, res) => {
