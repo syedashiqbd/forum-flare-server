@@ -39,6 +39,9 @@ async function run() {
     const postCollection = client.db('forumFlareDB').collection('posts');
     const tagCollection = client.db('forumFlareDB').collection('tags');
     const commentCollection = client.db('forumFlareDB').collection('comments');
+    const announcementCollection = client
+      .db('forumFlareDB')
+      .collection('announcements');
 
     // jwt related api
     app.post('/jwt', (req, res) => {
@@ -51,7 +54,7 @@ async function run() {
 
     // middlewares for verifyToken
     const verifyToken = (req, res, next) => {
-      console.log('inside verifyToken:', req.headers.authorization);
+      // console.log('inside verifyToken:', req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
@@ -324,6 +327,18 @@ async function run() {
           },
         }
       );
+      res.send(result);
+    });
+
+    //announcement api
+    app.post('/announcement', async (req, res) => {
+      const item = req.body;
+      const result = await announcementCollection.insertOne(item);
+      res.send(result);
+    });
+
+    app.get('/announcement', async (req, res) => {
+      const result = await announcementCollection.find().toArray();
       res.send(result);
     });
 
