@@ -82,8 +82,19 @@ async function run() {
 
     // user related api
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
-      const result = await userCollection.find().toArray();
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      const result = await userCollection
+        .find()
+        .skip(page * limit)
+        .limit(limit)
+        .toArray();
       res.send(result);
+    });
+
+    app.get('/usercount', async (req, res) => {
+      const result = await userCollection.estimatedDocumentCount();
+      res.send({ count: result });
     });
 
     app.post('/users', async (req, res) => {
