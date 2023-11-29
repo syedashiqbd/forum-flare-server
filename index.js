@@ -326,11 +326,10 @@ async function run() {
     });
 
     app.get('/comment/:id?', async (req, res) => {
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
       const postId = req.params.id;
-
-      // Check if postId is provided
       if (postId) {
-        // If postId is provided, retrieve comments for that post
         const query = { postId: postId };
         const result = await commentCollection.find(query).toArray();
         res.send(result);
@@ -338,9 +337,18 @@ async function run() {
         // If postId is not provided, retrieve all comments
         const allComments = await commentCollection
           .find({ feedback: { $exists: true } })
+          .skip(page * limit)
+          .limit(limit)
           .toArray();
         res.send(allComments);
       }
+    });
+
+    app.get('/repocomment', async (req, res) => {
+      const result = await commentCollection.countDocuments({
+        feedback: { $exists: true },
+      });
+      res.send({ count: result });
     });
 
     // update feedback and report for a comment
