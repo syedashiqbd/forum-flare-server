@@ -340,7 +340,7 @@ async function run() {
       );
       res.send(result);
     });
-    
+
     // update action and report for a comment
     app.patch('/comments/:id/action', async (req, res) => {
       const commentId = req.params.id;
@@ -367,6 +367,15 @@ async function run() {
     app.get('/announcement', async (req, res) => {
       const result = await announcementCollection.find().toArray();
       res.send(result);
+    });
+
+    //admin-stats
+    app.get('/admin-stats', verifyToken, verifyAdmin, async (req, res) => {
+      const posts = await postCollection.estimatedDocumentCount();
+      const comments = await commentCollection.estimatedDocumentCount();
+      const users = await userCollection.estimatedDocumentCount();
+
+      res.send({ posts, comments, users });
     });
 
     // Send a ping to confirm a successful connection
