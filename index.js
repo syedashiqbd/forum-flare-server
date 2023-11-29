@@ -306,11 +306,22 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/comment/:id', async (req, res) => {
+    app.get('/comment/:id?', async (req, res) => {
       const postId = req.params.id;
-      const query = { postId: postId };
-      const result = await commentCollection.find(query).toArray();
-      res.send(result);
+
+      // Check if postId is provided
+      if (postId) {
+        // If postId is provided, retrieve comments for that post
+        const query = { postId: postId };
+        const result = await commentCollection.find(query).toArray();
+        res.send(result);
+      } else {
+        // If postId is not provided, retrieve all comments
+        const allComments = await commentCollection
+          .find({ feedback: { $exists: true } })
+          .toArray();
+        res.send(allComments);
+      }
     });
 
     // update feedback and report for a comment
@@ -324,6 +335,22 @@ async function run() {
           $set: {
             feedback,
             reported: true,
+          },
+        }
+      );
+      res.send(result);
+    });
+    
+    // update action and report for a comment
+    app.patch('/comments/:id/action', async (req, res) => {
+      const commentId = req.params.id;
+      const { action } = req.body;
+
+      const result = await commentCollection.updateOne(
+        { _id: new ObjectId(commentId) },
+        {
+          $set: {
+            action,
           },
         }
       );
