@@ -344,7 +344,7 @@ async function run() {
       }
     });
 
-    app.get('/repocomment', async (req, res) => {
+    app.get('/repocomment', verifyToken, verifyAdmin, async (req, res) => {
       const result = await commentCollection.countDocuments({
         feedback: { $exists: true },
       });
