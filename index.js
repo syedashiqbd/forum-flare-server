@@ -249,6 +249,14 @@ async function run() {
       res.send(result);
     });
 
+    app.post('/tags', async (req, res) => {
+      const tag = req.body;
+      console.log(tag);
+
+      const result = await tagCollection.insertOne(tag);
+      res.send(result);
+    });
+
     // vote related api
     app.patch('/upvote/:id', async (req, res) => {
       const id = req.params.id;
